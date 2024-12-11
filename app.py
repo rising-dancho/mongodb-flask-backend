@@ -7,6 +7,7 @@ from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -14,13 +15,16 @@ CORS(app)
 
 # MongoDB connection URI
 uri = os.getenv("MONGO_URI")
+
 client = MongoClient(uri, server_api=ServerApi("1"))
 db = client.flask_database  # MongoDB database
 todos = db.todos  # MongoDB collection
 
+
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({"message": "Welcome to the Flask API with MongoDB!"})
+
 
 @app.route("/get", methods=["GET"])
 def get_articles():
@@ -28,6 +32,7 @@ def get_articles():
     for todo in all_todos:
         todo["_id"] = str(todo["_id"])
     return jsonify(all_todos)
+
 
 @app.route("/get/<id>", methods=["GET"])
 def get_single_article(id):
@@ -41,6 +46,7 @@ def get_single_article(id):
     except Exception as e:
         return jsonify({"error": "Invalid ID format"}), 400
 
+
 @app.route("/add", methods=["POST"])
 def add_article():
     try:
@@ -50,17 +56,14 @@ def add_article():
         if not title or not body:
             return jsonify({"error": "Title and body are required"}), 400
 
-        new_todo = {
-            "title": title,
-            "body": body,
-            "date": datetime.datetime.now()
-        }
+        new_todo = {"title": title, "body": body, "date": datetime.datetime.now()}
 
         result = todos.insert_one(new_todo)
         new_todo["_id"] = str(result.inserted_id)
         return jsonify(new_todo)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/update/<id>", methods=["PUT"])
 def update_article(id):
@@ -74,7 +77,7 @@ def update_article(id):
         updated_todo = todos.find_one_and_update(
             {"_id": ObjectId(id)},
             {"$set": {"title": title, "body": body}},
-            return_document=True
+            return_document=True,
         )
 
         if updated_todo:
@@ -84,6 +87,7 @@ def update_article(id):
             return jsonify({"error": "Todo not found"}), 404
     except Exception as e:
         return jsonify({"error": "Invalid ID format"}), 400
+
 
 @app.route("/delete/<id>", methods=["DELETE"])
 def delete_article(id):
@@ -95,6 +99,7 @@ def delete_article(id):
             return jsonify({"error": "Todo not found"}), 404
     except Exception as e:
         return jsonify({"error": "Invalid ID format"}), 400
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
