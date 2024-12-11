@@ -14,9 +14,10 @@ app = Flask(__name__)
 CORS(app)
 
 # MongoDB connection URI
-# uri = os.getenv("MONGO_URI")
-uri="mongodb+srv://josealejoperezjr:denden123@cluster0.hg9gr.mongodb.net/flask_database?retryWrites=true&w=majority&appName=Cluster0"
+uri = os.getenv("MONGO_URI")
+print(uri) 
 
+uri="mongodb+srv://josealejoperezjr:denden123@cluster0.hg9gr.mongodb.net/flask_database?retryWrites=true&w=majority&appName=Cluster0"
 
 
 client = MongoClient(uri, server_api=ServerApi("1"))
